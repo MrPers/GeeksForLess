@@ -30,10 +30,7 @@ namespace GeeksForLessMVC.Controllers
         [HttpGet]
         public async Task<IActionResult> Display()
         {
-            var result = await _context.TreeElements
-                .Where(x => x.Name == string.Empty)
-                .Include(u => u.Childrens)
-                .FirstAsync();
+            var result =  await ListTreeElement();
 
             return View(result);
         }
@@ -92,6 +89,33 @@ namespace GeeksForLessMVC.Controllers
             return result;
         }
 
+        async Task<TreeElement> ListTreeElement(int id = 1)
+        {
+            var treeElement = await _context.TreeElements
+                .Where(x => x.Id == id)
+                .Include(u => u.Childrens)
+                .FirstAsync();
+
+            List<int> treeElements = new List<int>();
+
+            foreach (var dot in treeElement.Childrens)
+            {
+                treeElements.Add(dot.Id);
+            }
+
+            treeElement.Childrens = new List<TreeElement>();
+
+            if (treeElements.Any())
+            {
+                foreach (var treeElementId in treeElements)
+                {
+                    treeElement.Childrens.Add(await ListTreeElement(treeElementId));
+                }
+            }
+
+            return treeElement;
+        }
+
         static TreeElement NewMethod(JToken configRoot)
         {
             TreeElement treeElement = new()
@@ -121,7 +145,7 @@ namespace GeeksForLessMVC.Controllers
     public class TreeElement
     {
         [Key]
-        public int? Id { get; set; }
+        public int Id { get; set; }
         [Required(AllowEmptyStrings = false)]
         public string Name { get; set; } = string.Empty;
         public string? Value { get; set; }

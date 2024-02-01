@@ -1,10 +1,17 @@
-﻿
-@model GeeksForLessMVC.Controllers.TreeElement
+﻿@model GeeksForLessMVC.Controllers.TreeElement
 
 
-
-
-<span>@Model.Name</span>
+@{
+    if (String.IsNullOrEmpty(Model.Name))
+    {
+        <span>Root :</span>
+    }
+    else
+    {
+        <span>@Model.Name :</span>
+    }
+}
+</span>
 @if (Model.Childrens.Any())
 {
     <ul class="nested">
@@ -16,18 +23,10 @@
         }
     </ul>
 }
-
-      
-<h1>Welcome to Razor Yhatzee!</h1>
-<p>Here's the roll of 5 die:</p>
-@{
-    Random generator = new Random();
-    int[] dice = new int[5];
-    <ul>
-        @foreach (int die in dice)
-        {
-            <li>@generator.Next()</li>
-        }
-    </ul>
-    // ... more code
+else
+{
+    <span>@Model.Value;
+    </span>
 }
+
+    
