@@ -1,0 +1,33 @@
+﻿
+@model GeeksForLessMVC.Controllers.TreeElement
+
+
+
+
+<span>@Model.Name</span>
+@if (Model.Childrens.Any())
+{
+    <ul class="nested">
+        @foreach (var child in Model.Childrens)
+        {
+            <li>
+                @await Html.PartialAsync("Display", child)
+            </li>
+        }
+    </ul>
+}
+
+      
+<h1>Welcome to Razor Yhatzee!</h1>
+<p>Here's the roll of 5 die:</p>
+@{
+    Random generator = new Random();
+    int[] dice = new int[5];
+    <ul>
+        @foreach (int die in dice)
+        {
+            <li>@generator.Next()</li>
+        }
+    </ul>
+    // ... more code
+}
