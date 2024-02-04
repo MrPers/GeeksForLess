@@ -36,12 +36,13 @@ namespace GeeksForLessMVC
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseEndpoints(x => x.MapDefaultControllerRoute());
 
             app.UseAuthorization();
 
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+            //app.MapControllerRoute(
+            //    name: "default",
+            //    pattern: "{controller=Home}/{action=Index}/{id?}");
 
             await SeedDatabaseAsync(app);
 

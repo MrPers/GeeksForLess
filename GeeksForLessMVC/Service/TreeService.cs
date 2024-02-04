@@ -3,7 +3,9 @@ using GeeksForLessMVC.Interfaces;
 using GeeksForLessMVC.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
+using System.IO;
 using System.Text;
+using System.Xml.Linq;
 
 namespace GeeksForLessMVC.Service
 {
@@ -14,6 +16,7 @@ namespace GeeksForLessMVC.Service
         {
             _treeData = treeData;
         }
+
         public async Task<TreeElement> ListTreeElementAsync(int id)
         {
             TreeElement treeElement = await _treeData.TreeElementAsync(id);
@@ -59,12 +62,18 @@ namespace GeeksForLessMVC.Service
                 case "json":
                 {
                     JToken configRoot = JToken.Parse(contentFile.ToString());
-                    treeElement = Read(configRoot);
+                    treeElement = ReadJSON(configRoot);
                     break;
                 }
                 case "txt":
                 {
-
+                    List<string> lines = contentFile.ToString().Split("\r\n").ToList();
+                    lines.RemoveAt(lines.Count - 1);
+                    foreach (var line in lines)
+                    {
+                        List<string> segment = line.Split(":").ToList();
+                        ReadTXT(treeElement, segment);
+                    }
                     break;
                 }
                 default:
@@ -73,7 +82,7 @@ namespace GeeksForLessMVC.Service
             return await _treeData.AddAsync(treeElement);
         }
 
-        private static TreeElement Read(JToken content)
+        private static TreeElement ReadJSON(JToken content)
         {
             TreeElement treeElement = new()
             {
@@ -85,7 +94,7 @@ namespace GeeksForLessMVC.Service
                 case JObject nonTerminal:
                     foreach (var child in nonTerminal.Children<JProperty>())
                     {
-                        treeElement.Childrens.Add(Read(child.Value));
+                        treeElement.Childrens.Add(ReadJSON(child.Value));
                     }
                     break;
                 case JValue terminal:
@@ -98,6 +107,37 @@ namespace GeeksForLessMVC.Service
             }
 
             return treeElement;
+        }
+
+        private static void ReadTXT(TreeElement treeElement, List<string> segment)
+        {
+            if (segment.Count > 2)
+            {
+                string treeElementName = segment[0];
+                segment.RemoveAt(0);
+                TreeElement? treeElementNode = treeElement.Childrens
+                    .FirstOrDefault(x => x.Name == treeElementName);
+
+                if (treeElementNode == null)
+                {
+                    treeElementNode = new TreeElement()
+                    {
+                        Name = treeElementName
+                    };
+
+                    treeElement.Childrens.Add(treeElementNode);
+                }
+
+                ReadTXT(treeElementNode, segment);
+            }
+            else
+            {
+                treeElement.Childrens.Add(new TreeElement()
+                {
+                    Name = segment[0],
+                    Value = segment[1]
+                });
+            }
         }
     }
 }

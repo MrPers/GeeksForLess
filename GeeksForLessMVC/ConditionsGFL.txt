@@ -1,0 +1,12 @@
+Create a web application that will accept as input a configuration file in JSON format (the complexity/nesting of the configuration can be any). The system should read the file and convert this configuration into a program model, then save it in the relational database. As a result, the system should display the saved configuration (from the database) on the screen (in the form of a hierarchical tree).
+What needs to be developed:
+1. Relational database for saving the configuration (MSSQL).
+2. Web application for displaying the configuration read from the database. The web page should display the configuration in a hierarchical form (tree).
+To work, use asp.net core 8 mvc.
+Bonus 1: Add the ability to accept as input a regular .txt file, in which the configuration is written as follows (each entry on a new line):
+keyA:keyB:keyC:value1
+keyA:keyB:keyD:value2
+keyE:value3
+keyC:keyD:value4
+keyA:keyD:value5
+Bonus 2: Add the ability to navigate through the configuration via URL (with the configuration displayed for the entered root). If this is a "leaf" element of the branch, then output the value. If it is a "root" element, then display a sub-tree. Proofreading is welcome.

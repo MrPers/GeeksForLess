@@ -26,7 +26,7 @@ namespace GeeksForLessMVC.Data
 
         public async Task<bool> DeleteAsync()
         {
-            var result = _context.Database.ExecuteSqlRaw("TRUNCATE TABLE [TreeElements]") != 0;
+            var result = await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE [TreeElements]") != 0;
 
             return result;
         }
