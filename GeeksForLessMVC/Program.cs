@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Cors.Infrastructure;
+using GeeksForLessMVC.Contracts;
+using GeeksForLessMVC.Data;
+using GeeksForLessMVC.Interfaces;
+using GeeksForLessMVC.Service;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System;
 
 namespace GeeksForLessMVC
 {
@@ -14,10 +14,14 @@ namespace GeeksForLessMVC
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            builder.Services.AddDbContext<MyDbContext>(options =>
-            {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-            });
+            builder.Services.AddScoped<ITreeService, TreeService>();
+            builder.Services.AddScoped(typeof(ITreeData), typeof(TreeData));
+
+            string connection = builder.Configuration.GetConnectionString("DefaultConnection");
+            builder.Services.AddDbContext<MyDbContext>(options => options.UseSqlServer(connection)); //SQL
+
+            builder.Services.AddMemoryCache();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -39,25 +43,24 @@ namespace GeeksForLessMVC
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
-            //await SeedDatabaseAsync(app);
+            await SeedDatabaseAsync(app);
 
             app.Run();
         }
 
-        //private static async Task SeedDatabaseAsync(WebApplication host)
-        //{
-        //    using (var scope = host.Services.CreateScope())
-        //    {
-        //        IServiceProvider scopeServiceProvider = scope.ServiceProvider;
+        private static async Task SeedDatabaseAsync(WebApplication host)
+        {
+            using (var scope = host.Services.CreateScope())
+            {
+                IServiceProvider scopeServiceProvider = scope.ServiceProvider;
 
-        //        var context = scopeServiceProvider.GetRequiredService<MyDbContext>();
+                var context = scopeServiceProvider.GetRequiredService<MyDbContext>();
 
-        //        if (context.Database.EnsureCreated())
-        //        {
-        //            await scopeServiceProvider.GetRequiredService<MyDbContext>().Database.MigrateAsync();
-        //        }
+                if (context.Database.EnsureCreated())
+                {
+                }
 
-        //    }
-        //}
+            }
+        }
     }
 }

@@ -1,8 +1,9 @@
 ﻿using GeeksForLessMVC.Controllers;
+using GeeksForLessMVC.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 
-namespace GeeksForLessMVC
+namespace GeeksForLessMVC.Data
 {
     public class MyDbContext : DbContext
     {
